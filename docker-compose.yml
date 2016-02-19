@@ -1,0 +1,52 @@
+route:
+  image: nginx
+  ports:
+    - "80:80"
+  links:
+    - dokuwiki
+  volumes:
+    - ./conf/nginx.route.conf:/etc/nginx/conf.d/default.conf
+    - ./dokuwiki:/usr/share/nginx/html
+
+dokuwiki:
+  image: nginx
+  links:
+    - dokuwikiphp
+  volumes:
+    - ./conf/nginx.dokuwiki.conf:/etc/nginx/conf.d/default.conf
+    - ./dokuwiki:/usr/share/nginx/html
+
+dokuwikiphp:
+  build: .
+  links:
+    - mysql
+    - redis
+    - mongo
+    - memcached1
+    - memcached2
+    - memcached3
+  volumes:
+    - ./conf/php.ini:/usr/local/etc/php/php.ini
+    - ./dokuwiki:/usr/share/nginx/html
+  working_dir: /usr/share/nginx/html
+
+mysql:
+  image: mariadb:10
+  environment:
+    MYSQL_ROOT_PASSWORD: password
+    MYSQL_DATABASE: default
+
+redis:
+  image: redis
+
+mongo:
+  image: mongo
+
+memcached1:
+  image: memcached
+
+memcached2:
+  image: memcached
+
+memcached3:
+  image: memcached
